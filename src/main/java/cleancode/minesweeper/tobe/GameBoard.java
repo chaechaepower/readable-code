@@ -1,16 +1,21 @@
 package cleancode.minesweeper.tobe;
 
+import cleancode.minesweeper.tobe.gamelevel.GameLevel;
+
 import java.util.Arrays;
 import java.util.Random;
 
 public class GameBoard {
 
-    public static final int LAND_MINE_COUNT = 10;
-
+    public final int landMineCount;
     private final Cell[][] board; //점진적 리팩터링
 
-    public GameBoard(int rowSize, int colSize) {
-        board=new Cell[rowSize][colSize];
+    public GameBoard(GameLevel gameLevel) {
+        int rowSize = gameLevel.getRowSize();
+        int colSize = gameLevel.getColSize();
+        board = new Cell[rowSize][colSize];
+
+        landMineCount = gameLevel.getLandMineCount();
     }
 
     public void flag(int rowIdx, int colIndex) {
@@ -34,9 +39,9 @@ public class GameBoard {
             return;
         }
 
-        open(row,col);
+        open(row, col);
 
-        if (findCell(row,col).hasLandMineCount()) { // getter로 꺼내서 0이랑 비교하지말고 메서드로 물어보기
+        if (findCell(row, col).hasLandMineCount()) { // getter로 꺼내서 0이랑 비교하지말고 메서드로 물어보기
             return;
         }
 
@@ -72,8 +77,8 @@ public class GameBoard {
     }
 
     public void initializeGame() {
-        int rowSize=board.length;
-        int colSize=board[0].length;
+        int rowSize = board.length;
+        int colSize = board[0].length;
 
         for (int row = 0; row < rowSize; row++) {
             for (int col = 0; col < colSize; col++) {
@@ -81,7 +86,7 @@ public class GameBoard {
             }
         }
 
-        for (int i = 0; i < LAND_MINE_COUNT; i++) {
+        for (int i = 0; i < landMineCount; i++) {
             int landMineCol = new Random().nextInt(colSize);
             int landMineRow = new Random().nextInt(rowSize);
             Cell landMineCell = findCell(landMineRow, landMineCol);
@@ -102,7 +107,7 @@ public class GameBoard {
     }
 
     public String getSign(int rowIndex, int colIndex) {
-        Cell cell = findCell(rowIndex,colIndex);
+        Cell cell = findCell(rowIndex, colIndex);
         return cell.getSign();
     }
 
@@ -119,8 +124,8 @@ public class GameBoard {
     }
 
     private int countNearbyLandMines(int row, int col) {
-        int rowSize=getRowSize();
-        int colSize=getColSize();
+        int rowSize = getRowSize();
+        int colSize = getColSize();
 
         int count = 0;
 
@@ -130,13 +135,13 @@ public class GameBoard {
         if (row - 1 >= 0 && doesCellHaveLandMineCount(row - 1, col)) {
             count++;
         }
-        if (row - 1 >= 0 && col + 1 <colSize && doesCellHaveLandMineCount(row - 1, col + 1)) {
+        if (row - 1 >= 0 && col + 1 < colSize && doesCellHaveLandMineCount(row - 1, col + 1)) {
             count++;
         }
         if (col - 1 >= 0 && doesCellHaveLandMineCount(row, col - 1)) {
             count++;
         }
-        if (col + 1 <colSize && doesCellHaveLandMineCount(row, col + 1)) {
+        if (col + 1 < colSize && doesCellHaveLandMineCount(row, col + 1)) {
             count++;
         }
         if (row + 1 < rowSize && col - 1 >= 0 && doesCellHaveLandMineCount(row + 1, col - 1)) {
@@ -145,7 +150,7 @@ public class GameBoard {
         if (row + 1 < rowSize && doesCellHaveLandMineCount(row + 1, col)) {
             count++;
         }
-        if (row + 1 < rowSize && col + 1 <colSize && doesCellHaveLandMineCount(row + 1, col + 1)) {
+        if (row + 1 < rowSize && col + 1 < colSize && doesCellHaveLandMineCount(row + 1, col + 1)) {
             count++;
         }
         return count;
