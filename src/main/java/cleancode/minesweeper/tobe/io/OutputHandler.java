@@ -21,5 +21,5 @@ public interface OutputHandler {
     public void showExceptionMessage(GameException e);
 
     public void showSimpleMessage(String message);
-    }
+
 }
