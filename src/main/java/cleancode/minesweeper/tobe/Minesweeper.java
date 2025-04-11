@@ -6,6 +6,7 @@ import cleancode.minesweeper.tobe.gamelevel.GameLevel;
 import cleancode.minesweeper.tobe.io.InputHandler;
 import cleancode.minesweeper.tobe.io.OutputHandler;
 import cleancode.minesweeper.tobe.position.CellPosition;
+import cleancode.minesweeper.tobe.user.UserAction;
 
 
 public class Minesweeper implements GameInitalizable, GameRunnable {
@@ -44,7 +45,7 @@ public class Minesweeper implements GameInitalizable, GameRunnable {
                 }
 
                 CellPosition cellPosition = getCellInputFromUser(); // a1
-                String userActionInput = getUserActionInput(); // 1. 깃발 꽂기 2. 셀 오픈
+                UserAction userActionInput = getUserActionInput(); // 1. 깃발 꽂기 2. 셀 오픈
                 actOnCell(cellPosition, userActionInput);
             }
         } catch (GameException e) { //의도적으로 프로그램 내에서 던진 예외 catch
@@ -54,7 +55,7 @@ public class Minesweeper implements GameInitalizable, GameRunnable {
         }
     }
 
-    private void actOnCell(CellPosition cellPosition, String userActionInput) {
+    private void actOnCell(CellPosition cellPosition, UserAction userActionInput) {
          if (doseUserChooseToPlantFlag(userActionInput)) {
             gameBoard.flagAt(cellPosition); //전치사 포함한 메서드명으로 변경
             checkIfGameIsOver();
@@ -80,18 +81,18 @@ public class Minesweeper implements GameInitalizable, GameRunnable {
         gameStatus = -1;
     }
 
-    private boolean doseUserChooseToOpenCell(String userActionInput) {
-        return userActionInput.equals("1");
+    private boolean doseUserChooseToOpenCell(UserAction userActionInput) {
+        return userActionInput==UserAction.OPEN;
     }
 
-    private boolean doseUserChooseToPlantFlag(String userActionInput) {
-        return userActionInput.equals("2");
+    private boolean doseUserChooseToPlantFlag(UserAction userActionInput) {
+        return userActionInput==UserAction.FLAG;
     }
 
 
-    private String getUserActionInput() {
+    private UserAction getUserActionInput() {
         outputHandler.showCommentForUserAction();
-        return inputHandler.getUserInput();
+        return inputHandler.getUserActionFromUser();
     }
 
     private CellPosition getCellInputFromUser() {
