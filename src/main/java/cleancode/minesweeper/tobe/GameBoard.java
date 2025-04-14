@@ -15,6 +15,7 @@ public class GameBoard {
 
     public final int landMineCount;
     private final Cell[][] board; //점진적 리팩터링
+    private GameStatus gameStatus;
 
     public GameBoard(GameLevel gameLevel) {
         int rowSize = gameLevel.getRowSize();
@@ -22,14 +23,28 @@ public class GameBoard {
         board = new Cell[rowSize][colSize];
 
         landMineCount = gameLevel.getLandMineCount();
+        initializeGameStatus();
     }
 
     public void flagAt(CellPosition cellPosition) {
         Cell cell = findCell(cellPosition);
         cell.flag();
+
+        checkIfGameIsOver();
     }
 
-    public void openAt(CellPosition cellPosition) {
+    private void checkIfGameIsOver() {
+        if (isAllCellChecked()) {
+            changeGameStatusToWin();
+        }
+    }
+
+    private void changeGameStatusToWin() {
+        gameStatus = GameStatus.WIN;
+    }
+
+
+    public void openOneCellAt(CellPosition cellPosition) {
         Cell cell = findCell(cellPosition);
         cell.open();
     }
@@ -92,22 +107,28 @@ public class GameBoard {
     }
 
     public void initializeGame() {
+        initializeGameStatus();
         CellPositions cellPositions = CellPositions.from(board);
 
         //빈 셀 초기화
         initializeEmptyCells(cellPositions);
 
         //지뢰 셀 할당
-        List<CellPosition> landMinePositions=cellPositions.extractRandomPositions(landMineCount);
+        List<CellPosition> landMinePositions = cellPositions.extractRandomPositions(landMineCount);
         initializeLandMineCells(landMinePositions);
 
         //숫자 셀 할당
-        List<CellPosition> numberPositionsCandidates=cellPositions.subtract(landMinePositions); //지뢰가 아닌 셀들. 0일 수 있음.
+        List<CellPosition> numberPositionsCandidates = cellPositions.subtract(landMinePositions); //지뢰가 아닌 셀들. 0일 수 있음.
         initializeNumberCells(numberPositionsCandidates);
     }
 
+    //추상화 레벨이 낮아보여 메소드로 추출
+    private void initializeGameStatus() {
+        gameStatus = GameStatus.IN_PROGRESS;
+    }
+
     private void initializeEmptyCells(CellPositions cellPositions) {
-        List<CellPosition> allPositions= cellPositions.getPositions();
+        List<CellPosition> allPositions = cellPositions.getPositions();
         for (CellPosition position : allPositions) {
             updateCellAt(position, new EmptyCell());
         }
@@ -152,7 +173,6 @@ public class GameBoard {
                 .filter(this::isLandMineCellAt)
                 .count();
 
-
         return (int) count;
     }
 
@@ -166,4 +186,30 @@ public class GameBoard {
     }
 
 
+    public boolean isInProgress() {
+        return gameStatus == GameStatus.IN_PROGRESS;
+    }
+
+    public void openAt(CellPosition cellPosition) {
+        if (isLandMineCellAt(cellPosition)) {
+            openOneCellAt(cellPosition); //셀을 연다.
+            changeGameStatusToLose();
+            return;
+        }
+
+        openSurroundedCells(cellPosition);
+        checkIfGameIsOver();
+    }
+
+    private void changeGameStatusToLose() {
+        gameStatus = GameStatus.LOSE;
+    }
+
+    public boolean isWinStatus() {
+        return gameStatus==GameStatus.WIN;
+    }
+
+    public boolean isLoseStatus() {
+        return gameStatus==GameStatus.LOSE;
+    }
 }
