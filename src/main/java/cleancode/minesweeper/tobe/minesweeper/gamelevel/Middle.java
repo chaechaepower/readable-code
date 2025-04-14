@@ -3,16 +3,16 @@ package cleancode.minesweeper.tobe.minesweeper.gamelevel;
 public class Middle implements GameLevel{
     @Override
     public int getRowSize() {
-        return 18;
+        return 100;
     }
 
     @Override
     public int getColSize() {
-        return 14;
+        return 100;
     }
 
     @Override
     public int getLandMineCount() {
-        return 20;
+        return 5;
     }
 }
