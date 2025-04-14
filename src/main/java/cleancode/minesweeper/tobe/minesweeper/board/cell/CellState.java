@@ -23,10 +23,6 @@ public class CellState {
         this.isOpened=true;
     }
 
-    public boolean isChecked() {
-        return isFlagged || isOpened; //깃발을 꽂았거나, 열었거나
-    }
-
     public boolean isOpened() {
         return isOpened;
     }
